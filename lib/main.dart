@@ -7,6 +7,8 @@ void main() {
   runApp(const MyApp());
 }
 
+// tes mobile jaja
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
