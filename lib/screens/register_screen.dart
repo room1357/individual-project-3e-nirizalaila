@@ -6,105 +6,93 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register'), backgroundColor: Colors.blue),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Create Account'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Logo
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.person_add, size: 50, color: Colors.white),
-            ),
-            SizedBox(height: 32),
-
-            // Full Name Field
-            TextField(
+            const SizedBox(height: 30),
+            Image.asset('assets/logo_flutter.png', height: 70),
+            const SizedBox(height: 30),
+            const TextField(
               decoration: InputDecoration(
                 labelText: 'Full Name',
-                border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
+                border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-
-            // Email Field
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: 'Email',
-                border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.email),
+                border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-
-            // Username Field
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: 'Username',
-                border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.account_circle),
+                border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-
-            // Password Field
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
-                border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-
-            // Confirm Password Field
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
-                border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.lock_outline),
+                border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 24),
-
-            // Register Button
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle register
+                  Navigator.pushReplacementNamed(context, '/home');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Colors.indigo,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: Text(
+                child: const Text(
                   'REGISTER',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-            SizedBox(height: 16),
-
-            // Login Link
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Already have an account? "),
+                const Text("Already have an account? "),
                 TextButton(
                   onPressed: () {
-                    // Navigate to login
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
-                  child: Text('Login'),
+                  child: const Text('Login'),
                 ),
               ],
             ),
