@@ -8,9 +8,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  // Daftar produk (pakai gambar dari assets)
   final List<Map<String, dynamic>> products = [
     {
       'name': 'Kopi Arabica',
@@ -34,52 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
-  // Ubah konten body berdasarkan index bottom nav
-  Widget _getBody() {
-    switch (_selectedIndex) {
-      case 0:
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GridView.builder(
-            itemCount: products.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.8,
-            ),
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return _buildProductCard(
-                product['image'],
-                product['name'],
-                product['price'],
-              );
-            },
-          ),
-        );
-
-      case 1:
-        return const Center(
-          child: Text(
-            'Halaman Profil',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        );
-
-      case 2:
-        return const Center(
-          child: Text(
-            'Halaman Pengaturan',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        );
-
-      default:
-        return const SizedBox();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: Colors.white,
       ),
 
-      // Drawer di sebelah kiri
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -110,9 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Profil'),
               onTap: () {
                 Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 1;
-                });
+                Navigator.pushNamed(context, '/profile');
               },
             ),
             ListTile(
@@ -120,9 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Pengaturan'),
               onTap: () {
                 Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 2;
-                });
+                Navigator.pushNamed(context, '/settings');
               },
             ),
             const Divider(),
@@ -137,7 +83,26 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      body: _getBody(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.builder(
+          itemCount: products.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio: 0.8,
+          ),
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return _buildProductCard(
+              product['image'],
+              product['name'],
+              product['price'],
+            );
+          },
+        ),
+      ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -151,13 +116,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
         selectedItemColor: Colors.indigo,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+          if (index == 0) {
+            // tetap di Home
+          } else if (index == 1) {
+            Navigator.pushNamed(context, '/profile');
+          } else if (index == 2) {
+            Navigator.pushNamed(context, '/settings');
+          }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -171,7 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Card produk
   Widget _buildProductCard(String imageAsset, String title, String price) {
     return Card(
       elevation: 4,

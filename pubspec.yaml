@@ -64,6 +64,7 @@ flutter:
     - assets/produk/teh.png
     - assets/produk/susu.png
     - assets/produk/cokelat.png
+    - assets/foto_profil.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
