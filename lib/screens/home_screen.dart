@@ -41,10 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (index == 0) {
       // Tetap di Home
     } else if (index == 1) {
-      Navigator.pushNamed(context, '/expense');
-    } else if (index == 2) {
-      Navigator.pushNamed(context, '/profile');
-    } else if (index == 3) {
       Navigator.pushNamed(context, '/settings');
     }
   }
@@ -155,11 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onBottomNavTap,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Pengeluaran',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Pengaturan',

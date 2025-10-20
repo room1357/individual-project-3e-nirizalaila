@@ -25,6 +25,10 @@ class ExpenseManager {
     ),
   ];
 
+  static void addExpense(Expense expense) {
+    expenses.add(expense);
+  }
+
   static Map<String, double> getTotalByCategory(List<Expense> expenses) {
     Map<String, double> result = {};
     for (var expense in expenses) {
@@ -37,18 +41,6 @@ class ExpenseManager {
   static Expense? getHighestExpense(List<Expense> expenses) {
     if (expenses.isEmpty) return null;
     return expenses.reduce((a, b) => a.amount > b.amount ? a : b);
-  }
-
-  static List<Expense> getExpensesByMonth(
-    List<Expense> expenses,
-    int month,
-    int year,
-  ) {
-    return expenses
-        .where(
-          (expense) => expense.date.month == month && expense.date.year == year,
-        )
-        .toList();
   }
 
   static List<Expense> searchExpenses(List<Expense> expenses, String keyword) {
