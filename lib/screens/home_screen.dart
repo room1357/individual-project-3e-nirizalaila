@@ -31,6 +31,24 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
+  int _selectedIndex = 0;
+
+  void _onBottomNavTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) {
+      // Tetap di Home
+    } else if (index == 1) {
+      Navigator.pushNamed(context, '/expense');
+    } else if (index == 2) {
+      Navigator.pushNamed(context, '/profile');
+    } else if (index == 3) {
+      Navigator.pushNamed(context, '/settings');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +72,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.shopping_bag),
+              title: const Text('Produk'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bar_chart),
+              title: const Text('Pengeluaran'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/expense');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.person),
@@ -116,19 +149,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
         selectedItemColor: Colors.indigo,
         unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          if (index == 0) {
-            // tetap di Home
-          } else if (index == 1) {
-            Navigator.pushNamed(context, '/profile');
-          } else if (index == 2) {
-            Navigator.pushNamed(context, '/settings');
-          }
-        },
+        onTap: _onBottomNavTap,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Pengeluaran',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
