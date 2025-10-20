@@ -54,7 +54,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
@@ -108,18 +108,17 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
+              height: 45,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                icon: const Icon(Icons.save, color: Colors.white),
                 label: const Text(
                   'Simpan Pengeluaran',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 onPressed: _saveExpense,
               ),

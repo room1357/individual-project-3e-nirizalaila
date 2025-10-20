@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../model/expense.dart';
 import '../managers/expense_manager.dart';
 import 'add_expense_screen.dart';
+import 'edit_expense_screen.dart';
 
 class ExpenseScreen extends StatefulWidget {
   const ExpenseScreen({super.key});
@@ -117,21 +118,107 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           final e = filteredExpenses[i];
                           return Card(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 2,
-                            margin: const EdgeInsets.symmetric(vertical: 5),
-                            child: ListTile(
-                              title: Text(e.title),
-                              subtitle: Text(
-                                '${e.category} • ${e.date.toString().substring(0, 10)}',
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
                               ),
-                              trailing: Text(
-                                'Rp ${e.amount.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  color: Colors.teal,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // 🧾 Info Pengeluaran
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          e.title,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${e.category} • ${e.date.toString().substring(0, 10)}',
+                                          style: const TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // 💰 Nominal dan Tombol Edit
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Rp ${e.amount.toStringAsFixed(0)}',
+                                        style: const TextStyle(
+                                          color: Colors.teal,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      InkWell(
+                                        borderRadius: BorderRadius.circular(10),
+                                        onTap: () async {
+                                          final updatedExpense =
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (context) =>
+                                                          EditExpenseScreen(
+                                                            expense: e,
+                                                          ),
+                                                ),
+                                              );
+
+                                          if (updatedExpense != null &&
+                                              updatedExpense is Expense) {
+                                            setState(() {
+                                              final index = ExpenseManager
+                                                  .expenses
+                                                  .indexOf(e);
+                                              if (index != -1) {
+                                                ExpenseManager.expenses[index] =
+                                                    updatedExpense;
+                                              }
+                                              displayedExpenses =
+                                                  ExpenseManager.expenses;
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.indigo.withOpacity(
+                                              0.1,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.edit,
+                                            color: Colors.indigo,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -141,16 +228,16 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           ],
         ),
       ),
+
+      // ➕ Tambah Pengeluaran
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.teal,
         onPressed: () async {
-          // Navigasi ke halaman tambah pengeluaran
           final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
           );
 
-          // Jika ada hasil (pengeluaran baru)
           if (result != null && result is Expense) {
             setState(() {
               ExpenseManager.addExpense(result);
