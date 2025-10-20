@@ -85,6 +85,14 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.category),
+              title: const Text('Kategori Pengeluaran'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/category');
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.person),
               title: const Text('Profil'),
               onTap: () {
