@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../model/expense.dart';
+import '../services/expense_service.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -35,11 +36,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
 
-    final newExpense = Expense(
+    // gunakan ExpenseService
+    final newExpense = ExpenseService.addExpense(
       title: title,
       description: desc,
       amount: amount,
-      date: DateTime.now(),
       category: category,
     );
 

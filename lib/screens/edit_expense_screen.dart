@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../model/expense.dart';
+import '../services/expense_service.dart';
 
 class EditExpenseScreen extends StatefulWidget {
   final Expense expense;
@@ -35,29 +36,10 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
     selectedCategory = widget.expense.category;
   }
 
-  Widget _buildInput(
-    TextEditingController controller,
-    String label, {
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 14, color: Colors.black),
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      ),
-    );
-  }
-
   void _saveChanges() {
-    final title = titleController.text;
-    final desc = descController.text;
-    final amount = double.tryParse(amountController.text) ?? 0;
+    final title = titleController.text.trim();
+    final desc = descController.text.trim();
+    final amount = double.tryParse(amountController.text.trim()) ?? 0;
 
     if (title.isEmpty || desc.isEmpty || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,12 +48,12 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
       return;
     }
 
-    final updatedExpense = Expense(
+    final updatedExpense = ExpenseService.updateExpense(
+      oldExpense: widget.expense,
       title: title,
       description: desc,
-      category: selectedCategory,
       amount: amount,
-      date: widget.expense.date, // tetap pakai tanggal lama
+      category: selectedCategory,
     );
 
     Navigator.pop(context, updatedExpense);
@@ -143,6 +125,25 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInput(
+    TextEditingController controller,
+    String label, {
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: const TextStyle(fontSize: 14, color: Colors.black),
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       ),
     );
   }
