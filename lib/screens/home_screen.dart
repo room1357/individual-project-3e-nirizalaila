@@ -100,6 +100,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pushNamed(context, '/settings');
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Tes Looping'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/looping');
+              },
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
