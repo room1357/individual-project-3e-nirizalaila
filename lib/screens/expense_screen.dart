@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../model/expense.dart';
 import '../managers/expense_manager.dart';
+import 'add_expense_screen.dart';
 
 class ExpenseScreen extends StatefulWidget {
   const ExpenseScreen({super.key});
@@ -17,160 +18,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   double get total => displayedExpenses.fold(0.0, (sum, e) => sum + e.amount);
   double get average =>
       displayedExpenses.isNotEmpty ? total / displayedExpenses.length : 0.0;
-
-  // ➕ Tambah pengeluaran
-  void _showAddExpenseDialog() {
-    final titleController = TextEditingController();
-    final descController = TextEditingController();
-    final amountController = TextEditingController();
-    String? selectedCategory;
-
-    final categories = [
-      'Operasional',
-      'Marketing',
-      'Logistik',
-      'Hiburan',
-      'Lainnya',
-    ];
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Tambah Pengeluaran',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                _buildInput(titleController, 'Nama Pengeluaran'),
-                const SizedBox(height: 10),
-                _buildInput(descController, 'Deskripsi'),
-                const SizedBox(height: 10),
-                _buildInput(
-                  amountController,
-                  'Jumlah (Rp)',
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  value: selectedCategory,
-                  items:
-                      categories
-                          .map(
-                            (cat) =>
-                                DropdownMenuItem(value: cat, child: Text(cat)),
-                          )
-                          .toList(),
-                  onChanged: (val) => selectedCategory = val,
-                  decoration: InputDecoration(
-                    labelText: 'Kategori',
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'Batal',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        final title = titleController.text;
-                        final desc = descController.text;
-                        final amount =
-                            double.tryParse(amountController.text) ?? 0;
-                        final category = selectedCategory ?? '';
-
-                        if (title.isEmpty ||
-                            desc.isEmpty ||
-                            amount <= 0 ||
-                            category.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Harap isi semua kolom dengan benar!',
-                              ),
-                            ),
-                          );
-                          return;
-                        }
-
-                        final newExpense = Expense(
-                          title: title,
-                          description: desc,
-                          amount: amount,
-                          date: DateTime.now(),
-                          category: category,
-                        );
-
-                        ExpenseManager.addExpense(newExpense);
-
-                        setState(() {
-                          displayedExpenses = ExpenseManager.expenses;
-                        });
-
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        'Simpan',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildInput(
-    TextEditingController controller,
-    String label, {
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 14, color: Colors.black),
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +143,21 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.teal,
-        onPressed: _showAddExpenseDialog,
+        onPressed: () async {
+          // Navigasi ke halaman tambah pengeluaran
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
+          );
+
+          // Jika ada hasil (pengeluaran baru)
+          if (result != null && result is Expense) {
+            setState(() {
+              ExpenseManager.addExpense(result);
+              displayedExpenses = ExpenseManager.expenses;
+            });
+          }
+        },
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
