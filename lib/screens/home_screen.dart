@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'statistics_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,23 +15,21 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-
-    if (index == 0) {
-      // Tetap di Home
-    } else if (index == 1) {
-      Navigator.pushNamed(context, '/settings');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      _buildHomeContent(context),
+      const StatisticsScreen(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Niriza Flutter App'),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -105,29 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: GridView.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 1,
-          children: [
-            _buildMenuCard(context, Icons.shopping_bag, 'Produk', '/products'),
-            _buildMenuCard(context, Icons.bar_chart, 'Pengeluaran', '/expense'),
-            _buildMenuCard(
-              context,
-              Icons.category,
-              'Kategori Pengeluaran',
-              '/category',
-            ),
-            _buildMenuCard(context, Icons.person, 'Profil', '/profile'),
-            _buildMenuCard(context, Icons.settings, 'Pengaturan', '/settings'),
-          ],
-        ),
-      ),
-
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.indigo,
@@ -136,8 +113,31 @@ class _HomeScreenState extends State<HomeScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Pengaturan',
+            icon: Icon(Icons.bar_chart_outlined),
+            label: 'Statistik',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHomeContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 1,
+        children: [
+          _buildMenuCard(context, Icons.person, 'Profil', '/profile'),
+          _buildMenuCard(context, Icons.shopping_bag, 'Produk', '/products'),
+          _buildMenuCard(context, Icons.bar_chart, 'Pengeluaran', '/expense'),
+          _buildMenuCard(
+            context,
+            Icons.category,
+            'Kategori Pengeluaran',
+            '/category',
           ),
         ],
       ),

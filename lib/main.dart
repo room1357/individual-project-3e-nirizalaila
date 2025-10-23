@@ -9,6 +9,7 @@ import 'screens/expense_screen.dart';
 import 'screens/looping_screen.dart';
 import 'screens/category_screen.dart';
 import 'screens/products_screen.dart';
+import 'screens/statistics_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/looping': (context) => const LoopingScreen(),
         '/category': (context) => const CategoryScreen(),
         '/products': (context) => ProductsScreen(),
+        '/statistics': (context) => StatisticsScreen(),
       },
     );
   }
