@@ -24,7 +24,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
       name: 'Logistik',
       description: 'Transportasi dan distribusi barang',
     ),
+    Category(name: 'Hiburan', description: 'Acara dan kegiatan non-produktif'),
+    Category(
+      name: 'Lainnya',
+      description: 'Kategori tambahan sesuai kebutuhan',
+    ),
   ];
+
+  String searchQuery = '';
+
+  List<Category> get filteredCategories {
+    return _categories.where((cat) {
+      final query = searchQuery.toLowerCase();
+      return cat.name.toLowerCase().contains(query) ||
+          cat.description.toLowerCase().contains(query);
+    }).toList();
+  }
 
   Future<void> _addCategory() async {
     final newCategory = await Navigator.push(
@@ -68,26 +83,25 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Batal'),
               ),
-              InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: () {
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
                   setState(() {
                     _categories.removeAt(index);
                   });
                   Navigator.pop(context);
                 },
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.redAccent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.delete,
-                    color: Colors.redAccent,
-                    size: 18,
-                  ),
-                ),
+                child: const Text('Hapus'),
               ),
             ],
           ),
@@ -96,72 +110,140 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final categoriesToShow = filteredCategories;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kelola Kategori'),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      body:
-          _categories.isEmpty
-              ? const Center(child: Text('Belum ada kategori'))
-              : ListView.builder(
-                itemCount: _categories.length,
-                padding: const EdgeInsets.all(12),
-                itemBuilder: (context, index) {
-                  final category = _categories[index];
-                  return Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    child: ListTile(
-                      title: Text(category.name),
-                      subtitle: Text(category.description),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            onTap: () => _editCategory(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.indigo.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.edit,
-                                color: Colors.indigo,
-                                size: 18,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            onTap: () => _deleteCategory(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.delete,
-                                color: Colors.redAccent,
-                                size: 18,
-                              ),
-                            ),
-                          ),
-                        ],
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // 🔍 Search dan Tambah
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Cari kategori...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      isDense: true,
                     ),
-                  );
-                },
-              ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addCategory,
-        backgroundColor: Colors.indigo,
-        child: const Icon(Icons.add, color: Colors.white),
+                    onChanged: (val) => setState(() => searchQuery = val),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: _addCategory,
+                  child: const Text('Tambah'),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // 📋 Daftar Kategori
+            Expanded(
+              child:
+                  categoriesToShow.isEmpty
+                      ? const Center(child: Text('Belum ada kategori'))
+                      : ListView.builder(
+                        itemCount: categoriesToShow.length,
+                        itemBuilder: (context, index) {
+                          final category = categoriesToShow[index];
+                          return Card(
+                            elevation: 2,
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              title: Text(
+                                category.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              subtitle: Text(
+                                category.description,
+                                style: const TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(10),
+                                    onTap:
+                                        () => _editCategory(
+                                          _categories.indexOf(category),
+                                        ),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blueAccent.withOpacity(
+                                          0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.edit,
+                                        color: Colors.blueAccent,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(10),
+                                    onTap:
+                                        () => _deleteCategory(
+                                          _categories.indexOf(category),
+                                        ),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.redAccent.withOpacity(
+                                          0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete,
+                                        color: Colors.redAccent,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+            ),
+          ],
+        ),
       ),
     );
   }

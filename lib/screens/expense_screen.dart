@@ -20,6 +20,70 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   double get average =>
       displayedExpenses.isNotEmpty ? total / displayedExpenses.length : 0.0;
 
+  void _deleteExpense(Expense expense) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Hapus Pengeluaran'),
+            content: Text(
+              'Yakin ingin menghapus pengeluaran "${expense.title}"?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  setState(() {
+                    ExpenseManager.expenses.remove(expense);
+                    displayedExpenses = ExpenseManager.expenses;
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text('Hapus'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Widget _buildSummaryCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: color.withOpacity(0.1),
+          child: Icon(icon, color: color),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        subtitle: Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredExpenses =
@@ -28,7 +92,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             searchQuery.toLowerCase(),
           );
           final matchFilter =
-              selectedFilter == null || e.category == selectedFilter;
+              selectedFilter == null ||
+              selectedFilter == 'Semua Pengeluaran' ||
+              e.category == selectedFilter;
           return matchQuery && matchFilter;
         }).toList();
 
@@ -43,17 +109,34 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Total: Rp ${total.toStringAsFixed(0)}',
-              style: const TextStyle(fontWeight: FontWeight.w500),
+            const Text(
+              'Ringkasan Pengeluaran',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            Text(
-              'Rata-rata: Rp ${average.toStringAsFixed(0)}',
-              style: const TextStyle(color: Colors.black54),
-            ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
 
-            // 🔍 Search dan Filter
+            _buildSummaryCard(
+              'Total Pengeluaran',
+              'Rp ${total.toStringAsFixed(0)}',
+              Icons.summarize,
+              Colors.indigo,
+            ),
+            _buildSummaryCard(
+              'Rata-rata Pengeluaran',
+              'Rp ${average.toStringAsFixed(0)}',
+              Icons.calculate,
+              Colors.teal,
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              'Manajemen Pengeluaran',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+
+            // 🔍 Search, Filter, dan Tambah
             Row(
               children: [
                 Expanded(
@@ -80,6 +163,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     hint: const Text('Filter'),
                     items:
                         [
+                              'Semua Pengeluaran',
                               'Operasional',
                               'Marketing',
                               'Logistik',
@@ -102,12 +186,41 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddExpenseScreen(),
+                      ),
+                    );
+
+                    if (result != null && result is Expense) {
+                      setState(() {
+                        ExpenseManager.addExpense(result);
+                        displayedExpenses = ExpenseManager.expenses;
+                      });
+                    }
+                  },
+                  child: const Text('Tambah'),
+                ),
               ],
             ),
 
             const SizedBox(height: 16),
 
-            // 📋 Daftar Pengeluaran
             Expanded(
               child:
                   filteredExpenses.isEmpty
@@ -131,7 +244,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // 🧾 Info Pengeluaran
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -155,8 +267,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                       ],
                                     ),
                                   ),
-
-                                  // 💰 Nominal dan Tombol Edit
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -202,7 +312,27 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                         child: Container(
                                           padding: const EdgeInsets.all(6),
                                           decoration: BoxDecoration(
-                                            color: Colors.indigo.withOpacity(
+                                            color: Colors.blueAccent
+                                                .withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.edit,
+                                            color: Colors.blueAccent,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      InkWell(
+                                        borderRadius: BorderRadius.circular(10),
+                                        onTap: () => _deleteExpense(e),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.redAccent.withOpacity(
                                               0.1,
                                             ),
                                             borderRadius: BorderRadius.circular(
@@ -210,8 +340,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                             ),
                                           ),
                                           child: const Icon(
-                                            Icons.edit,
-                                            color: Colors.indigo,
+                                            Icons.delete,
+                                            color: Colors.redAccent,
                                             size: 18,
                                           ),
                                         ),
@@ -227,25 +357,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             ),
           ],
         ),
-      ),
-
-      // ➕ Tambah Pengeluaran
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.indigo,
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
-          );
-
-          if (result != null && result is Expense) {
-            setState(() {
-              ExpenseManager.addExpense(result);
-              displayedExpenses = ExpenseManager.expenses;
-            });
-          }
-        },
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
