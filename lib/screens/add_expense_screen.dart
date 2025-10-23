@@ -52,7 +52,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tambah Pengeluaran'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -112,7 +112,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               height: 45,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
+                  backgroundColor: Colors.indigo,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

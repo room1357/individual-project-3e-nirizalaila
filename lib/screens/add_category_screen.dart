@@ -32,7 +32,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tambah Kategori'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -64,7 +64,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
               height: 45,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
+                  backgroundColor: Colors.indigo,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

@@ -21,9 +21,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text('Nama Pengguna', style: TextStyle(fontSize: 24)),
-            const Text('user@email.com',
-              style: TextStyle(fontSize: 16),
-            ),
+            const Text('user@email.com', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),

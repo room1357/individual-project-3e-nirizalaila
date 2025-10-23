@@ -99,7 +99,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kelola Kategori'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body:
@@ -125,7 +125,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: Colors.teal.withOpacity(0.1),
+                                color: Colors.indigo.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
@@ -160,7 +160,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addCategory,
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );

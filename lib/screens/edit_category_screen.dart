@@ -41,7 +41,7 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Kategori'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -58,7 +58,7 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
                 height: 45,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Colors.indigo,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

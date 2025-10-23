@@ -21,7 +21,7 @@ class LoopingScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tes Looping"),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body: Padding(

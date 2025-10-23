@@ -8,29 +8,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Map<String, dynamic>> products = [
-    {
-      'name': 'Kopi Arabica',
-      'price': 'Rp25.000',
-      'image': 'assets/produk/kopi.png',
-    },
-    {
-      'name': 'Teh Hijau',
-      'price': 'Rp18.000',
-      'image': 'assets/produk/teh.png',
-    },
-    {
-      'name': 'Susu Almond',
-      'price': 'Rp30.000',
-      'image': 'assets/produk/susu.png',
-    },
-    {
-      'name': 'Coklat Panas',
-      'price': 'Rp22.000',
-      'image': 'assets/produk/cokelat.png',
-    },
-  ];
-
   int _selectedIndex = 0;
 
   void _onBottomNavTap(int index) {
@@ -49,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Produk Kami'),
+        title: const Text('Niriza Flutter App'),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
@@ -70,10 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profil'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.shopping_bag),
               title: const Text('Produk'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.pushNamed(context, '/products');
               },
             ),
             ListTile(
@@ -93,14 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profil'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/profile');
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Pengaturan'),
               onTap: () {
@@ -109,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
+              leading: const Icon(Icons.loop),
               title: const Text('Tes Looping'),
               onTap: () {
                 Navigator.pop(context);
@@ -129,35 +107,25 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          itemCount: products.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 0.8,
-          ),
-          itemBuilder: (context, index) {
-            final product = products[index];
-            return _buildProductCard(
-              product['image'],
-              product['name'],
-              product['price'],
-            );
-          },
+        padding: const EdgeInsets.all(20),
+        child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 1,
+          children: [
+            _buildMenuCard(context, Icons.shopping_bag, 'Produk', '/products'),
+            _buildMenuCard(context, Icons.bar_chart, 'Pengeluaran', '/expense'),
+            _buildMenuCard(
+              context,
+              Icons.category,
+              'Kategori Pengeluaran',
+              '/category',
+            ),
+            _buildMenuCard(context, Icons.person, 'Profil', '/profile'),
+            _buildMenuCard(context, Icons.settings, 'Pengaturan', '/settings'),
+          ],
         ),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tambah produk baru (dummy)')),
-          );
-        },
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
 
       bottomNavigationBar: BottomNavigationBar(
@@ -176,45 +144,33 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProductCard(String imageAsset, String title, String price) {
+  Widget _buildMenuCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String route,
+  ) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Kamu memilih $title')));
-        },
         borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
+        onTap: () => Navigator.pushNamed(context, route),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 40, color: Colors.indigo),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Image.asset(imageAsset, fit: BoxFit.cover),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(price, style: const TextStyle(color: Colors.grey)),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

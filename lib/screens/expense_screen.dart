@@ -35,7 +35,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manajemen Pengeluaran'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -163,7 +163,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                       Text(
                                         'Rp ${e.amount.toStringAsFixed(0)}',
                                         style: const TextStyle(
-                                          color: Colors.teal,
+                                          color: Colors.indigo,
                                           fontWeight: FontWeight.w400,
                                           fontSize: 15,
                                         ),
@@ -231,7 +231,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
       // ➕ Tambah Pengeluaran
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
         onPressed: () async {
           final result = await Navigator.push(
             context,
