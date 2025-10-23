@@ -1,4 +1,13 @@
+import 'dart:io' show Platform, File;
+import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart';
+import 'dart:html' as html;
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+
 import '../model/category.dart';
 import 'edit_category_screen.dart';
 import 'add_category_screen.dart';
@@ -39,6 +48,112 @@ class _CategoryScreenState extends State<CategoryScreen> {
       return cat.name.toLowerCase().contains(query) ||
           cat.description.toLowerCase().contains(query);
     }).toList();
+  }
+
+  Future<void> exportToCSV() async {
+    final csvBuffer = StringBuffer();
+    csvBuffer.writeln('Nama Kategori,Deskripsi');
+
+    for (var cat in filteredCategories) {
+      csvBuffer.writeln('"${cat.name}","${cat.description}"');
+    }
+
+    final csvData = csvBuffer.toString();
+
+    try {
+      if (kIsWeb) {
+        final bytes = utf8.encode(csvData);
+        final blob = html.Blob([bytes]);
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor =
+            html.AnchorElement(href: url)
+              ..setAttribute('download', 'category_data.csv')
+              ..click();
+        html.Url.revokeObjectUrl(url);
+      } else {
+        final directory = await getApplicationDocumentsDirectory();
+        final path = '${directory.path}/category_data.csv';
+        final file = File(path);
+        await file.writeAsString(csvData);
+        await OpenFile.open(path);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data kategori berhasil diekspor ke CSV')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal mengekspor CSV: $e')));
+    }
+  }
+
+  Future<void> exportToPDF() async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build:
+            (context) => pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'Daftar Kategori',
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Table.fromTextArray(
+                  headers: ['Nama Kategori', 'Deskripsi'],
+                  data:
+                      filteredCategories
+                          .map((cat) => [cat.name, cat.description])
+                          .toList(),
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColors.indigo100,
+                  ),
+                  headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  cellStyle: const pw.TextStyle(fontSize: 10),
+                  cellAlignment: pw.Alignment.centerLeft,
+                  columnWidths: {
+                    0: const pw.FlexColumnWidth(3),
+                    1: const pw.FlexColumnWidth(5),
+                  },
+                ),
+              ],
+            ),
+      ),
+    );
+
+    try {
+      if (kIsWeb) {
+        final bytes = await pdf.save();
+        final blob = html.Blob([bytes], 'application/pdf');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor =
+            html.AnchorElement(href: url)
+              ..setAttribute('download', 'category_data.pdf')
+              ..click();
+        html.Url.revokeObjectUrl(url);
+      } else {
+        final directory = await getApplicationDocumentsDirectory();
+        final path = '${directory.path}/category_data.pdf';
+        final file = File(path);
+        await file.writeAsBytes(await pdf.save());
+        await OpenFile.open(path);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data kategori berhasil diekspor ke PDF')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal mengekspor PDF: $e')));
+    }
   }
 
   Future<void> _addCategory() async {
@@ -122,7 +237,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 🔍 Search dan Tambah
+            // 🔍 Search dan Tombol Ekspor
             Row(
               children: [
                 Expanded(
@@ -139,6 +254,34 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.file_present, size: 18),
+                  label: const Text('CSV'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 14,
+                    ),
+                  ),
+                  onPressed: exportToCSV,
+                ),
+                const SizedBox(width: 6),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.picture_as_pdf, size: 18),
+                  label: const Text('PDF'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 14,
+                    ),
+                  ),
+                  onPressed: exportToPDF,
+                ),
+                const SizedBox(width: 6),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.indigo,
@@ -159,7 +302,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
             const SizedBox(height: 16),
 
-            // 📋 Daftar Kategori
             Expanded(
               child:
                   categoriesToShow.isEmpty

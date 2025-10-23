@@ -1,4 +1,13 @@
+import 'dart:io' show Platform, File;
+import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart';
+import 'dart:html' as html;
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+
 import '../model/expense.dart';
 import '../managers/expense_manager.dart';
 import 'add_expense_screen.dart';
@@ -19,6 +28,129 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   double get total => displayedExpenses.fold(0.0, (sum, e) => sum + e.amount);
   double get average =>
       displayedExpenses.isNotEmpty ? total / displayedExpenses.length : 0.0;
+
+  Future<void> exportToCSV() async {
+    final csvBuffer = StringBuffer();
+    csvBuffer.writeln('Nama Pengeluaran,Deskripsi,Kategori,Nominal,Tanggal');
+
+    for (var e in displayedExpenses) {
+      csvBuffer.writeln(
+        '"${e.title}","${e.description}","${e.category}",'
+        '"${e.amount}","${e.date.toIso8601String()}"',
+      );
+    }
+
+    final csvData = csvBuffer.toString();
+
+    try {
+      if (kIsWeb) {
+        final bytes = utf8.encode(csvData);
+        final blob = html.Blob([bytes]);
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor =
+            html.AnchorElement(href: url)
+              ..setAttribute('download', 'expense_data.csv')
+              ..click();
+        html.Url.revokeObjectUrl(url);
+      } else {
+        final directory = await getApplicationDocumentsDirectory();
+        final path = '${directory.path}/expense_data.csv';
+        final file = File(path);
+        await file.writeAsString(csvData);
+        await OpenFile.open(path);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data berhasil diekspor ke CSV')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal mengekspor CSV: $e')));
+    }
+  }
+
+  Future<void> exportToPDF() async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build:
+            (context) => pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'Laporan Pengeluaran',
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Table.fromTextArray(
+                  headers: [
+                    'Nama Pengeluaran',
+                    'Kategori',
+                    'Nominal',
+                    'Tanggal',
+                  ],
+                  data:
+                      displayedExpenses
+                          .map(
+                            (e) => [
+                              e.title,
+                              e.category,
+                              'Rp ${e.amount.toStringAsFixed(0)}',
+                              e.date.toString().substring(0, 10),
+                            ],
+                          )
+                          .toList(),
+                  headerDecoration: pw.BoxDecoration(
+                    color: PdfColors.indigo100,
+                  ),
+                  headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  cellStyle: const pw.TextStyle(fontSize: 10),
+                  cellAlignment: pw.Alignment.centerLeft,
+                  columnWidths: {
+                    0: const pw.FlexColumnWidth(3),
+                    1: const pw.FlexColumnWidth(2),
+                    2: const pw.FlexColumnWidth(2),
+                    3: const pw.FlexColumnWidth(2),
+                  },
+                ),
+              ],
+            ),
+      ),
+    );
+
+    try {
+      if (kIsWeb) {
+        final bytes = await pdf.save();
+        final blob = html.Blob([bytes], 'application/pdf');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor =
+            html.AnchorElement(href: url)
+              ..setAttribute('download', 'expense_data.pdf')
+              ..click();
+        html.Url.revokeObjectUrl(url);
+      } else {
+        final directory = await getApplicationDocumentsDirectory();
+        final path = '${directory.path}/expense_data.pdf';
+        final file = File(path);
+        await file.writeAsBytes(await pdf.save());
+        await OpenFile.open(path);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data berhasil diekspor ke PDF')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal mengekspor PDF: $e')));
+    }
+  }
 
   void _deleteExpense(Expense expense) {
     showDialog(
@@ -136,7 +268,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             ),
             const SizedBox(height: 10),
 
-            // 🔍 Search, Filter, dan Tambah
             Row(
               children: [
                 Expanded(
@@ -156,37 +287,34 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Expanded(
-                  flex: 1,
-                  child: DropdownButtonFormField<String>(
-                    value: selectedFilter,
-                    hint: const Text('Filter'),
-                    items:
-                        [
-                              'Semua Pengeluaran',
-                              'Operasional',
-                              'Marketing',
-                              'Logistik',
-                              'Hiburan',
-                              'Lainnya',
-                            ]
-                            .map(
-                              (cat) => DropdownMenuItem(
-                                value: cat,
-                                child: Text(cat),
-                              ),
-                            )
-                            .toList(),
-                    onChanged: (val) => setState(() => selectedFilter = val),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.file_present, size: 18),
+                  label: const Text('CSV'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 14,
                     ),
                   ),
+                  onPressed: exportToCSV,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 6),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.picture_as_pdf, size: 18),
+                  label: const Text('PDF'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 14,
+                    ),
+                  ),
+                  onPressed: exportToPDF,
+                ),
+                const SizedBox(width: 6),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.indigo,
