@@ -36,13 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             leading: const Icon(Icons.person),
             title: const Text('Edit Profil'),
             subtitle: const Text('Ubah nama, foto, atau email Anda'),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Fitur Edit Profil belum tersedia'),
-                ),
-              );
-            },
+            onTap: () => Navigator.pushNamed(context, '/edit_profile'),
           ),
           const Divider(),
 
@@ -76,7 +70,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               );
             },
           ),
-
           const SizedBox(height: 20),
         ],
       ),

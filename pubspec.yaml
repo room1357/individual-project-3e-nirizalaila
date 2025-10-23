@@ -40,6 +40,8 @@ dependencies:
   pdf: ^3.10.6
   path_provider: ^2.1.2
   open_file: ^3.3.2
+  shared_preferences: ^2.3.2
+  image_picker: ^1.1.1
 
 dev_dependencies:
   flutter_test:
